@@ -25,3 +25,4 @@ jobs:
           region: europe-west2
           credentials: ${{ secrets.GCP_DEPLOY_KEY }}
           env_vars: VERSION=${{steps.tag.outputs.tag}}
+          service_account_email: ddns-function-runner@personal-projects-223614.iam.gserviceaccount.com
