@@ -65,11 +65,11 @@ func SendResponse(w http.ResponseWriter, statusCode int, body string) {
 }
 
 func GetUsername() (string, error) {
-	return GetSecret("function-ddns-username")
+	return GetSecret(os.Getenv("USERNAME_SECRET"))
 }
 
 func GetPassword() (string, error) {
-	return GetSecret("function-ddns-password")
+	return GetSecret(os.Getenv("PASSWORD_SECRET"))
 }
 
 func GetSecret(name string) (string, error) {
