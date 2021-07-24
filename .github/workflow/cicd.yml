@@ -1,0 +1,21 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  publish:
+    - uses: google-github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GCP_DEPLOY_KEY }}
+        export_default_credentials: true
+    - uses: actions/checkout@v2
+    - id: Deploy
+      uses: google-github-actions/deploy-cloud-functions@main
+      with:
+        name: ddns
+        runtime: go113
+        entry_point: HandleDDNSUpdate
+        region: europe-west2
