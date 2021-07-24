@@ -29,8 +29,8 @@ func HandleRootPath(w http.ResponseWriter) {
 
 func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
 	providedUsername, providedPassword, basicOk := r.BasicAuth()
-	_, ipOk := r.URL.Query()["myip"]
-	_, hostnameOk := r.URL.Query()["hostname"]
+	ip, ipOk := r.URL.Query()["myip"]
+	hostname, hostnameOk := r.URL.Query()["hostname"]
 	username, usernameErr := GetUsername()
 	password, passwordErr := GetPassword()
 
@@ -49,6 +49,7 @@ func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
 	} else if username != providedUsername || password != providedPassword {
 		SendResponse(w, 401, "badauth")
 	} else {
+		log.Printf("Starting update for %s to %s", hostname, ip)
 		SendResponse(w, 501, "Not Implemented")
 	}
 }
