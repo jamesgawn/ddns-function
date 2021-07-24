@@ -20,6 +20,7 @@ jobs:
         with:
           name: ddns
           runtime: go113
+          memory_mb: 128
           entry_point: Handler
           region: europe-west2
           credentials: ${{ secrets.GCP_DEPLOY_KEY }}
