@@ -1,23 +1,19 @@
 package ddnsfunction
 
 import (
-	"encoding/json"
 	"fmt"
-	"html"
+	"log"
 	"net/http"
 )
 
 func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
-	var d struct {
-		Name string `json:"name"`
+	sendResponse(w, 200, "Hello World!")
+}
+
+func sendResponse(w http.ResponseWriter, statusCode int, body string) {
+	w.WriteHeader(statusCode)
+	_, err := fmt.Fprint(w, body)
+	if err != nil {
+		log.Fatal(err)
 	}
-	if err := json.NewDecoder(r.Body).Decode(&d); err != nil {
-		fmt.Fprint(w, "Hello, World!")
-		return
-	}
-	if d.Name == "" {
-		fmt.Fprint(w, "Hello, World!")
-		return
-	}
-	fmt.Fprintf(w, "Hello, %s!", html.EscapeString(d.Name))
 }
