@@ -8,7 +8,13 @@ import (
 )
 
 func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
-	SendResponse(w, 200, "Hello World!")
+	version := ObtainVersion()
+	if r.Method == http.MethodGet && r.URL.Path == "/" {
+		body := fmt.Sprintf("Dynamic DNS Service (%s)", version)
+		SendResponse(w, 200, body)
+	} else {
+		SendResponse(w, 404, "Not Found")
+	}
 }
 
 func SendResponse(w http.ResponseWriter, statusCode int, body string) {
