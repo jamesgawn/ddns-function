@@ -6,10 +6,32 @@ on:
     branches: [ master ]
 
 jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.16.0'
+      - name: Confirm Version
+        run: go version
+      - name: Install dependencies
+        run: go get -u golang.org/x/lint/golint
+      - name: Run build
+        run: go build .
+      - name: Vet
+        run: go vet .
+      - name: Lint
+        run : golint .
+      - name: Unit Tests
+        run: go test
   tag:
     name: Tag
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    needs: [test]
     steps:
       - uses: actions/checkout@v2
       - name: Bump version and push tag
