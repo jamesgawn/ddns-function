@@ -12,6 +12,8 @@ func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet && r.URL.Path == "/" {
 		body := fmt.Sprintf("Dynamic DNS Service (%s)", version)
 		SendResponse(w, 200, body)
+	} else if r.Method == http.MethodGet && r.URL.Path == "/nic/update" {
+		SendResponse(w, 501, "Not Implemented")
 	} else {
 		SendResponse(w, 404, "Not Found")
 	}
