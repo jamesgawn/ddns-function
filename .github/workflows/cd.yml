@@ -1,9 +1,8 @@
 name: Test & Deploy
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - 'v*.*.*'
 
 jobs:
   deploy:
