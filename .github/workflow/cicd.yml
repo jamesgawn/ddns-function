@@ -6,11 +6,12 @@ on:
     branches: [ master ]
 
 jobs:
-  publish:
-    name: Publish to GCP Cloud Functions
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - uses: google-github-actions/setup-gcloud@master
+      - name: Setup Credentials
+        uses: google-github-actions/setup-gcloud@master
         with:
           service_account_key: ${{ secrets.GCP_DEPLOY_KEY }}
           export_default_credentials: true
