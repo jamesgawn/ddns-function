@@ -24,28 +24,23 @@ func HandleRootPath(w http.ResponseWriter) {
 }
 
 func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
-	providedUsername, providedPassword, ok := r.BasicAuth()
-	if !ok {
-		SendResponse(w, 401, "badauth")
-	}
-
-	_, ok = r.URL.Query()["myip"]
-	if !ok {
-		SendResponse(w, 400, "No IP address provided")
-	}
-
-	_, ok = r.URL.Query()["hostname"]
-	if !ok {
-		SendResponse(w, 400, "No hostname provided")
-	}
-
+	providedUsername, providedPassword, basicOk := r.BasicAuth()
+	_, ipOk := r.URL.Query()["myip"]
+	_, hostnameOk := r.URL.Query()["hostname"]
 	username := os.Getenv("username")
 	password := os.Getenv("password")
-	if username != providedUsername || password != providedPassword {
-		SendResponse(w, 401, "badauth")
-	}
 
-	SendResponse(w, 501, "Not Implemented")
+	if !basicOk {
+		SendResponse(w, 401, "badauth")
+	} else if !ipOk {
+		SendResponse(w, 400, "No IP address provided")
+	} else if !hostnameOk {
+		SendResponse(w, 400, "No hostname provided")
+	} else if username != providedUsername || password != providedPassword {
+		SendResponse(w, 401, "badauth")
+	} else {
+		SendResponse(w, 501, "Not Implemented")
+	}
 }
 
 func SendResponse(w http.ResponseWriter, statusCode int, body string) {
@@ -56,11 +51,6 @@ func SendResponse(w http.ResponseWriter, statusCode int, body string) {
 	_, err := fmt.Fprint(w, body)
 	if err != nil {
 		log.Fatal(err)
-	}
-	if statusCode >= 200 && statusCode < 400 {
-		os.Exit(0)
-	} else {
-		os.Exit(1)
 	}
 }
 
