@@ -10,13 +10,6 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      # Setup credentials
-      - name: Setup Credentials
-        uses: google-github-actions/setup-gcloud@master
-        with:
-          service_account_key: ${{ secrets.GCP_DEPLOY_KEY }}
-          export_default_credentials: true
-
       # Obtain the source code
       - uses: actions/checkout@v2
 
@@ -28,3 +21,4 @@ jobs:
           runtime: go113
           entry_point: HandleDDNSUpdate
           region: europe-west2
+          credentials: ${{ secrets.GCP_DEPLOY_KEY }}
