@@ -1,10 +1,14 @@
 package ddnsfunction
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+
+	secretmanager "cloud.google.com/go/secretmanager/apiv1"
+	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -27,8 +31,8 @@ func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
 	providedUsername, providedPassword, basicOk := r.BasicAuth()
 	_, ipOk := r.URL.Query()["myip"]
 	_, hostnameOk := r.URL.Query()["hostname"]
-	username := GetUsername()
-	password := GetPassword()
+	username, usernameErr := GetUsername()
+	password, passwordErr := GetPassword()
 
 	if !basicOk {
 		SendResponse(w, 401, "badauth")
@@ -36,6 +40,12 @@ func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
 		SendResponse(w, 400, "No IP address provided")
 	} else if !hostnameOk {
 		SendResponse(w, 400, "No hostname provided")
+	} else if usernameErr != nil {
+		SendResponse(w, 500, "")
+		log.Fatal(usernameErr)
+	} else if passwordErr != nil {
+		SendResponse(w, 500, "")
+		log.Fatal(passwordErr)
 	} else if username != providedUsername || password != providedPassword {
 		SendResponse(w, 401, "badauth")
 	} else {
@@ -54,12 +64,38 @@ func SendResponse(w http.ResponseWriter, statusCode int, body string) {
 	}
 }
 
-func GetUsername() string {
-	return os.Getenv("username")
+func GetUsername() (string, error) {
+	return GetSecret("function-ddns-username")
 }
 
-func GetPassword() string {
-	return os.Getenv("password")
+func GetPassword() (string, error) {
+	return GetSecret("function-ddns-password")
+}
+
+func GetSecret(name string) (string, error) {
+	ctx := context.Background()
+	c, err := secretmanager.NewClient(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	defer func(c *secretmanager.Client) {
+		err := c.Close()
+		if err != nil {
+			log.Fatal("Unable to close connection to secret manager.")
+		}
+	}(c)
+
+	req := &secretmanagerpb.AccessSecretVersionRequest{
+		Name: name,
+	}
+
+	result, err := c.AccessSecretVersion(ctx, req)
+	if err != nil {
+		return "", err
+	}
+
+	return string(result.Payload.Data), nil
 }
 
 func ObtainVersion() string {
