@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestHandleDDNSUpdate(t *testing.T) {
+func TestHandler(t *testing.T) {
 	tests := []struct {
 		inputMethod     string
 		inputPath       string
@@ -33,7 +33,7 @@ func TestHandleDDNSUpdate(t *testing.T) {
 		req.Header.Add("Content-Type", "application/text")
 
 		rr := httptest.NewRecorder()
-		HandleDDNSUpdate(rr, req)
+		Handler(rr, req)
 
 		if got := rr.Body.String(); got != test.outputBody {
 			t.Errorf("HelloHTTP(%q) = %q, want %q", test.inputBody, got, test.outputBody)

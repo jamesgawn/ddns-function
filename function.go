@@ -7,16 +7,45 @@ import (
 	"os"
 )
 
-func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
-	version := ObtainVersion()
+func Handler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet && r.URL.Path == "/" {
-		body := fmt.Sprintf("Dynamic DNS Service (%s)", version)
-		SendResponse(w, 200, body)
+		HandleRootPath(w)
 	} else if r.Method == http.MethodGet && r.URL.Path == "/nic/update" {
-		SendResponse(w, 501, "Not Implemented")
+		HandleDDNSUpdate(w, r)
 	} else {
 		SendResponse(w, 404, "Not Found")
 	}
+}
+
+func HandleRootPath(w http.ResponseWriter) {
+	version := ObtainVersion()
+	body := fmt.Sprintf("Dynamic DNS Service (%s)", version)
+	SendResponse(w, 200, body)
+}
+
+func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
+	providedUsername, providedPassword, ok := r.BasicAuth()
+	if !ok {
+		SendResponse(w, 401, "badauth")
+	}
+
+	_, ok = r.URL.Query()["myip"]
+	if !ok {
+		SendResponse(w, 400, "No IP address provided")
+	}
+
+	_, ok = r.URL.Query()["hostname"]
+	if !ok {
+		SendResponse(w, 400, "No hostname provided")
+	}
+
+	username := os.Getenv("username")
+	password := os.Getenv("password")
+	if username != providedUsername || password != providedPassword {
+		SendResponse(w, 401, "badauth")
+	}
+
+	SendResponse(w, 501, "Not Implemented")
 }
 
 func SendResponse(w http.ResponseWriter, statusCode int, body string) {
@@ -27,6 +56,11 @@ func SendResponse(w http.ResponseWriter, statusCode int, body string) {
 	_, err := fmt.Fprint(w, body)
 	if err != nil {
 		log.Fatal(err)
+	}
+	if statusCode >= 200 && statusCode < 400 {
+		os.Exit(0)
+	} else {
+		os.Exit(1)
 	}
 }
 

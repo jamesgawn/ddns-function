@@ -20,7 +20,7 @@ jobs:
         with:
           name: ddns
           runtime: go113
-          entry_point: HandleDDNSUpdate
+          entry_point: Handler
           region: europe-west2
           credentials: ${{ secrets.GCP_DEPLOY_KEY }}
           env_vars: VERSION=${{steps.tag.outputs.tag}}
