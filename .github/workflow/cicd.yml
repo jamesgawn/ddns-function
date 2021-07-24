@@ -7,6 +7,8 @@ on:
 
 jobs:
   publish:
+    name: Publish to GCP Cloud Functions
+    runs-on: ubuntu-latest
     - uses: google-github-actions/setup-gcloud@master
       with:
         service_account_key: ${{ secrets.GCP_DEPLOY_KEY }}
