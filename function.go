@@ -27,8 +27,8 @@ func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
 	providedUsername, providedPassword, basicOk := r.BasicAuth()
 	_, ipOk := r.URL.Query()["myip"]
 	_, hostnameOk := r.URL.Query()["hostname"]
-	username := os.Getenv("username")
-	password := os.Getenv("password")
+	username := GetUsername()
+	password := GetPassword()
 
 	if !basicOk {
 		SendResponse(w, 401, "badauth")
@@ -52,6 +52,14 @@ func SendResponse(w http.ResponseWriter, statusCode int, body string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func GetUsername() string {
+	return os.Getenv("username")
+}
+
+func GetPassword() string {
+	return os.Getenv("password")
 }
 
 func ObtainVersion() string {
