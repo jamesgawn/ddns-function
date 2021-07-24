@@ -10,12 +10,17 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
+      # Setup credentials
       - name: Setup Credentials
         uses: google-github-actions/setup-gcloud@master
         with:
           service_account_key: ${{ secrets.GCP_DEPLOY_KEY }}
           export_default_credentials: true
+
+      # Obtain the source code
       - uses: actions/checkout@v2
+
+      # Push to GCP
       - id: Deploy
         uses: google-github-actions/deploy-cloud-functions@main
         with:
