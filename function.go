@@ -2,9 +2,9 @@ package ddnsfunction
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 )
 
 func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
@@ -23,9 +23,10 @@ func SendResponse(w http.ResponseWriter, statusCode int, body string) {
 }
 
 func ObtainVersion() string {
-	buf, err := ioutil.ReadFile("VERSION")
-	if err != nil {
-		log.Fatal(err)
+	version := os.Getenv("VERSION")
+	if version == "" {
+		return "0.0.0"
+	} else {
+		return version
 	}
-	return string(buf)
 }
