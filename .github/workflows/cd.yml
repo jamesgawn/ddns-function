@@ -24,7 +24,7 @@ jobs:
       - name: Package
         run: zip -r ./dist/ddns.zip ./bin
       - name: Deploy
-        uses: yvesgurcan/deploy-lambda-function
+        uses: yvesgurcan/deploy-lambda-function@v0.0.5
         with:
           package: ./dist/ddns.zip
           function-name: ddns
