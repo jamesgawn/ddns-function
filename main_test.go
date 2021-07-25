@@ -12,11 +12,11 @@ func TestObtainVersion(t *testing.T) {
 }
 
 func TestAuthenticate(t *testing.T) {
-	userErr := os.Setenv("USERNAME", "testuser")
+	userErr := os.Setenv("username", "testuser")
 	if userErr != nil {
 		t.Error(userErr)
 	}
-	passErr := os.Setenv("PASSWORD", "testing")
+	passErr := os.Setenv("password", "testing")
 	if passErr != nil {
 		t.Error(passErr)
 	}

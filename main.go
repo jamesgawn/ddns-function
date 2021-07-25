@@ -83,12 +83,6 @@ func authenticate(authHeader string) bool {
 			log.Infoln("Passed authorization")
 			return true
 		} else {
-			log.WithFields(log.Fields{
-				"username":         username,
-				"password":         password,
-				"providedUsername": providedUsername,
-				"providedPassword": providedPassword,
-			}).Info("Creds check")
 			log.Infoln("Incorrect user/pass provided")
 			return false
 		}
