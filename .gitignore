@@ -3,3 +3,4 @@
 /dist/
 /deploy/
 /bin
+terraform.tfvars
