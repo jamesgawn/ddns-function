@@ -1,2 +1,5 @@
 /.idea/
 /.terraform/
+/dist/
+/deploy/
+/bin

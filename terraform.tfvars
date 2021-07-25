@@ -1,6 +1,7 @@
 notification_sns_queue_name="EmergencyNotificationList"
 zone="gawn.uk"
 domain="ddns.gawn.uk"
-cert_domain="gawn.uk"
-
-
+cert_domain="*.gawn.uk"
+username="jamesgawn"
+password="ireallyseethisworkingdontyou"
+name="ddns"

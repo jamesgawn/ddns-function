@@ -15,14 +15,14 @@ jobs:
         id: tag
         run: echo ::set-output name=tag::$(echo $GITHUB_REF | cut -d / -f 3 | cut -c 2-)
       # Push to GCP
-      - id: Deploy
-        uses: google-github-actions/deploy-cloud-functions@main
-        with:
-          name: ddns
-          runtime: go113
-          memory_mb: 128
-          entry_point: Handler
-          region: europe-west2
-          credentials: ${{ secrets.GCP_DEPLOY_KEY }}
-          env_vars: VERSION=${{steps.tag.outputs.tag}},USERNAME_SECRET=projects/personal-projects-223614/secrets/function-ddns-username,PASSWORD_SECRET=projects/personal-projects-223614/secrets/function-ddns-password,AWS_REGION=eu-west-2,AWS_ACCESS_KEY_ID_SECRET=projects/583827719542/secrets/function-ddns-aws-access-key-id,AWS_SECRET_ACCESS_KEY_SECRET=projects/583827719542/secrets/function-ddns-aws-secret-access-key
-          service_account_email: ddns-function-runner@personal-projects-223614.iam.gserviceaccount.com
+#      - id: Deploy
+#        uses: google-github-actions/deploy-cloud-functions@main
+#        with:
+#          name: ddns
+#          runtime: go113
+#          memory_mb: 128
+#          entry_point: Handler
+#          region: europe-west2
+#          credentials: ${{ secrets.GCP_DEPLOY_KEY }}
+#          env_vars: VERSION=${{steps.tag.outputs.tag}},USERNAME_SECRET=projects/personal-projects-223614/secrets/function-ddns-username,PASSWORD_SECRET=projects/personal-projects-223614/secrets/function-ddns-password,AWS_REGION=eu-west-2,AWS_ACCESS_KEY_ID_SECRET=projects/583827719542/secrets/function-ddns-aws-access-key-id,AWS_SECRET_ACCESS_KEY_SECRET=projects/583827719542/secrets/function-ddns-aws-secret-access-key
+#          service_account_email: ddns-function-runner@personal-projects-223614.iam.gserviceaccount.com
