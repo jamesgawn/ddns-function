@@ -9,20 +9,23 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      # Obtain the source code
       - uses: actions/checkout@v2
       - name: Get the version
         id: tag
         run: echo ::set-output name=tag::$(echo $GITHUB_REF | cut -d / -f 3 | cut -c 2-)
-      # Push to GCP
-#      - id: Deploy
-#        uses: google-github-actions/deploy-cloud-functions@main
-#        with:
-#          name: ddns
-#          runtime: go113
-#          memory_mb: 128
-#          entry_point: Handler
-#          region: europe-west2
-#          credentials: ${{ secrets.GCP_DEPLOY_KEY }}
-#          env_vars: VERSION=${{steps.tag.outputs.tag}},USERNAME_SECRET=projects/personal-projects-223614/secrets/function-ddns-username,PASSWORD_SECRET=projects/personal-projects-223614/secrets/function-ddns-password,AWS_REGION=eu-west-2,AWS_ACCESS_KEY_ID_SECRET=projects/583827719542/secrets/function-ddns-aws-access-key-id,AWS_SECRET_ACCESS_KEY_SECRET=projects/583827719542/secrets/function-ddns-aws-secret-access-key
-#          service_account_email: ddns-function-runner@personal-projects-223614.iam.gserviceaccount.com
+      - name: Build
+        run: make build
+      - name: Package
+        run: zip -r ./dist/ddns.zip ./bin
+      - name: default deploy
+        uses: appleboy/lambda-action@master
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: eu-west-2
+          function_name: ddns
+          zip_file: dist/ddns.zip
+          memory_size: 128
+          timeout: 10
+          handler: main
+          runtime: go1.x
