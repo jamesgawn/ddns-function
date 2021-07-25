@@ -1,14 +1,14 @@
 package ddnsfunction
 
 import (
+	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"context"
 	"fmt"
+	route53helper "github.com/jamesgawn/route53-helper"
+	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 	"log"
 	"net/http"
 	"os"
-
-	secretmanager "cloud.google.com/go/secretmanager/apiv1"
-	secretmanagerpb "google.golang.org/genproto/googleapis/cloud/secretmanager/v1"
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -31,8 +31,10 @@ func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
 	providedUsername, providedPassword, basicOk := r.BasicAuth()
 	ip, ipOk := r.URL.Query()["myip"]
 	hostname, hostnameOk := r.URL.Query()["hostname"]
-	username, usernameErr := GetUsername()
-	password, passwordErr := GetPassword()
+	username, usernameErr := GetSecret(os.Getenv("USERNAME_SECRET"))
+	password, passwordErr := GetSecret(os.Getenv("PASSWORD_SECRET"))
+	awsAccessKeyId, awsAccessKeyIdErr := GetSecret(os.Getenv("AWS_ACCESS_KEY_ID_SECRET"))
+	awsSecretAccessKey, awsSecretAccessKeyErr := GetSecret(os.Getenv("AWS_SECRET_ACCESS_KEY_SECRET"))
 
 	if !basicOk {
 		SendResponse(w, 401, "badauth")
@@ -46,10 +48,23 @@ func HandleDDNSUpdate(w http.ResponseWriter, r *http.Request) {
 	} else if passwordErr != nil {
 		SendResponse(w, 500, "")
 		log.Fatal(passwordErr)
+	} else if awsAccessKeyIdErr != nil {
+		SendResponse(w, 500, "")
+		log.Fatal(awsAccessKeyIdErr)
+	} else if awsSecretAccessKeyErr != nil {
+		SendResponse(w, 500, "")
+		log.Fatal(awsSecretAccessKeyErr)
 	} else if username != providedUsername || password != providedPassword {
 		SendResponse(w, 401, "badauth")
 	} else {
 		log.Printf("Starting update for %s to %s", hostname, ip)
+
+		_, err := route53helper.GetClientWithCredentials(awsAccessKeyId, awsSecretAccessKey, "ddns client")
+		if err != nil {
+			SendResponse(w, 500, "Configuration Error")
+			log.Fatal(err)
+		}
+
 		SendResponse(w, 501, "Not Implemented")
 	}
 }
@@ -63,14 +78,6 @@ func SendResponse(w http.ResponseWriter, statusCode int, body string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func GetUsername() (string, error) {
-	return GetSecret(os.Getenv("USERNAME_SECRET"))
-}
-
-func GetPassword() (string, error) {
-	return GetSecret(os.Getenv("PASSWORD_SECRET"))
 }
 
 func GetSecret(name string) (string, error) {
