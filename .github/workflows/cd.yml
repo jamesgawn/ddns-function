@@ -23,16 +23,16 @@ jobs:
         run: make build
       - name: Package
         run: zip -r ./dist/ddns.zip ./bin
-      - name: Deploy
-        uses: appleboy/lambda-action@master
-        with:
-          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_region: eu-west-2
-          function_name: ddns
-          zip_file: dist/ddns.zip
-          memory_size: 128
-          timeout: 10
-          handler: main
-          role: arn:aws:iam::979779020614:role/ddns-lambda-execution-role
-          runtime: go1.x
+#      - name: Deploy
+#        uses: appleboy/lambda-action@master
+#        with:
+#          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws_region: eu-west-2
+#          function_name: ddns
+#          zip_file: dist/ddns.zip
+#          memory_size: 128
+#          timeout: 10
+#          handler: main
+#          role: arn:aws:iam::979779020614:role/ddns-lambda-execution-role
+#          runtime: go1.x
