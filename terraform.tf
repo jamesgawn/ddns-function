@@ -70,7 +70,6 @@ resource "aws_lambda_function" "lambda" {
     variables = {
       username = var.username
       password = var.password
-      version = "0.0.0"
     }
   }
 

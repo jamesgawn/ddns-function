@@ -13,6 +13,12 @@ jobs:
       - name: Get the version
         id: tag
         run: echo ::set-output name=tag::$(echo $GITHUB_REF | cut -d / -f 3 | cut -c 2-)
+      - name: Updating version number to ${{ env.versionNumber }}
+        uses: DamianReeves/write-file-action@v1.0
+        with:
+          path: ./VERSION
+          contents: ${{ steps.tag.outputs.tag }}
+          write-mode: overwrite
       - name: Build
         run: make build
       - name: Package

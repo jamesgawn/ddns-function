@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	route53helper "github.com/jamesgawn/route53-helper"
 	log "github.com/sirupsen/logrus"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -110,10 +111,12 @@ func buildResponse(statusCode int, body string) events.APIGatewayV2HTTPResponse 
 }
 
 func obtainVersion() string {
-	version := os.Getenv("version")
-	if version == "" {
+	versionRaw, err := ioutil.ReadFile("VERSION")
+	version := string(versionRaw)
+
+	if err != nil || version == "" {
 		return "0.0.0"
 	} else {
-		return version
+		return string(version)
 	}
 }
