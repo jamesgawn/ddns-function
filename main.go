@@ -55,8 +55,8 @@ func handleDDNSUpdate(req events.APIGatewayV2HTTPRequest) events.APIGatewayV2HTT
 			log.Error(err)
 			return buildResponse(500, "Configuration Error")
 		}
-
-		zone, err := route53helper.FindZone(client, &hostname)
+		zoneName := hostname + "."
+		zone, err := route53helper.FindZone(client, &zoneName)
 		log.WithFields(log.Fields{
 			"zone":  zone,
 			"error": err,
@@ -64,18 +64,16 @@ func handleDDNSUpdate(req events.APIGatewayV2HTTPRequest) events.APIGatewayV2HTT
 
 		if err != nil && strings.HasPrefix(err.Error(), "unable to find zone: ") {
 			startVal := strings.Index(hostname, ".")
-			parentZoneName := hostname[(startVal + 1):]
+			parentZoneName := hostname[(startVal+1):] + "."
 			zone, err = route53helper.FindZone(client, &parentZoneName)
 			log.WithFields(log.Fields{
 				"zone":  zone,
 				"error": err,
 			}).Info("Parent Zone Search")
-			if err != nil {
-				return buildResponse(400, "nohost")
-			}
-		} else if err != nil {
-			log.Error(err)
-			return buildResponse(500, "Whoops, something went wrong.")
+		}
+
+		if err != nil {
+			return buildResponse(400, "nohost")
 		}
 
 		err = route53helper.UpdateRecord(client, zone, &hostname, &ip)
