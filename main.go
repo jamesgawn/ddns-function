@@ -50,13 +50,38 @@ func handleDDNSUpdate(req events.APIGatewayV2HTTPRequest) events.APIGatewayV2HTT
 	} else {
 		log.Printf("Starting update for %s to %s", hostname, ip)
 
-		_, err := route53helper.GetClient()
+		client, err := route53helper.GetClient()
 		if err != nil {
 			log.Error(err)
 			return buildResponse(500, "Configuration Error")
 		}
 
-		return buildResponse(501, "Not Implemented")
+		zone, err := route53helper.FindZone(client, &hostname)
+		log.WithFields(log.Fields{
+			"zone":  zone,
+			"error": err,
+		}).Info("Initial Zone Search")
+
+		if err != nil && strings.HasPrefix(err.Error(), "unable to find zone: ") {
+			startVal := strings.Index(hostname, ".")
+			parentZoneName := hostname[startVal:]
+			zone, err = route53helper.FindZone(client, &parentZoneName)
+			log.WithFields(log.Fields{
+				"zone":  zone,
+				"error": err,
+			}).Info("Parent Zone Search")
+			if err != nil {
+				return buildResponse(400, "nohost")
+			}
+		}
+		err = route53helper.UpdateRecord(client, zone, &hostname, &ip)
+		if err == nil {
+			log.Error(err)
+			return buildResponse(500, "Woops, something went wrong.")
+		} else {
+			return buildResponse(200, fmt.Sprintf("good %s", ip))
+		}
+
 	}
 }
 
@@ -95,6 +120,10 @@ func authenticate(authHeader string) bool {
 
 func buildResponse(statusCode int, body string) events.APIGatewayV2HTTPResponse {
 	version := obtainVersion()
+	log.WithFields(log.Fields{
+		"statusCode": statusCode,
+		"body":       body,
+	}).Info("Sending response")
 	return events.APIGatewayV2HTTPResponse{
 		StatusCode: statusCode,
 		Body:       body,
