@@ -64,7 +64,7 @@ func handleDDNSUpdate(req events.APIGatewayV2HTTPRequest) events.APIGatewayV2HTT
 
 		if err != nil && strings.HasPrefix(err.Error(), "unable to find zone: ") {
 			startVal := strings.Index(hostname, ".")
-			parentZoneName := hostname[startVal:]
+			parentZoneName := hostname[(startVal + 1):]
 			zone, err = route53helper.FindZone(client, &parentZoneName)
 			log.WithFields(log.Fields{
 				"zone":  zone,

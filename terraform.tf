@@ -63,7 +63,7 @@ resource "aws_lambda_function" "lambda" {
   handler = "main"
   runtime = "go1.x"
   filename = data.archive_file.lambda_code.output_path
-  source_code_hash = data.archive_file.lambda_code.output_sha
+  source_code_hash = filebase64sha256(data.archive_file.lambda_code.output_path)
   memory_size = 128
   timeout = 20
   environment {
