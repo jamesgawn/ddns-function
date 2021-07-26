@@ -73,15 +73,18 @@ func handleDDNSUpdate(req events.APIGatewayV2HTTPRequest) events.APIGatewayV2HTT
 			if err != nil {
 				return buildResponse(400, "nohost")
 			}
+		} else if err != nil {
+			log.Error(err)
+			return buildResponse(500, "Whoops, something went wrong.")
 		}
+
 		err = route53helper.UpdateRecord(client, zone, &hostname, &ip)
 		if err == nil {
 			log.Error(err)
-			return buildResponse(500, "Woops, something went wrong.")
+			return buildResponse(500, "Whoops, something went wrong.")
 		} else {
 			return buildResponse(200, fmt.Sprintf("good %s", ip))
 		}
-
 	}
 }
 

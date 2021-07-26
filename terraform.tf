@@ -101,6 +101,37 @@ resource "aws_iam_role_policy_attachment" "lambda_execution_basis_role_attachmen
   role = aws_iam_role.lambda_execution_role.name
 }
 
+resource "aws_iam_policy" "ddns-service-update" {
+  name = "${var.name}-service-dns-update"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "route53:ChangeResourceRecordSets",
+            "Resource": "arn:aws:route53:::hostedzone/Z1Z4NARII70GPM"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "route53:ChangeResourceRecordSets",
+            "Resource": "arn:aws:route53:::hostedzone/Z02568913AU6JLN00TL3A"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "route53:ListHostedZones",
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ddns_update_attachment" {
+  policy_arn = aws_iam_policy.ddns-service-update.arn
+  role = aws_iam_role.lambda_execution_role.name
+}
+
 // API Gateway Configuration for Endpoints
 
 resource "aws_apigatewayv2_api" "api" {
