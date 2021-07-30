@@ -23,6 +23,11 @@ jobs:
         run: make build
       - name: Package
         run: zip -j ./dist/ddns.zip ./bin/main ./VERSION
+      - name: Archive Build
+        uses: actions/upload-artifact@v2
+        with:
+          name: ddns-${{ steps.tag.outputs.tag }}.zip
+          path: ./dist/ddns.zip
       - name: Deploy
         uses: yvesgurcan/deploy-lambda-function@v0.0.5
         with:
